@@ -1,35 +1,25 @@
 import streamlit as st
+import pandas as pd
 import joblib
-import re
+from sentimentalAnalysis import analyze_text  # import your function
 
-st.set_page_config(page_title="Sentiment Analyzer", layout="centered")
+# Load your trained model
+model = joblib.load("sentiment_model.joblib")
 
-@st.cache_resource
-def load_model(path="sentiment_model.joblib"):
-    return joblib.load(path)
+st.title("🎭 Sentiment Analysis Web App")
+st.write("Enter a sentence below to analyze its sentiment.")
 
-def clean_text(text):
-    text = str(text).lower()
-    text = re.sub(r"http\S+", "", text)
-    text = re.sub(r"[^a-z0-9\s]", "", text)
-    return text.strip()
-
-model = load_model()
-
-label_map = {0: "Negative", 1: "Neutral", 2: "Positive"}
-
-st.title("🎭 Sentiment Analysis")
-st.write("Type text below and the model will predict the sentiment.")
-
-text = st.text_area("Enter text", height=150)
+# Text input
+user_input = st.text_area("Enter text:", "")
 
 if st.button("Analyze"):
-    if not text.strip():
-        st.warning("Please enter some text.")
+    if user_input.strip():
+        # Call your function that processes text and uses the model
+        sentiment = analyze_text(user_input, model)
+        st.subheader("Result:")
+        st.success(f"Sentiment: {sentiment}")
     else:
-        cleaned = clean_text(text)
-        pred = model.predict([cleaned])[0]
-        st.success(f"Predicted sentiment: **{label_map.get(pred, 'Unknown')}**")
+        st.warning("Please enter some text before analyzing.")
 
 st.markdown("---")
-st.write("Model: MultinomialNB with TF-IDF vectorizer")
+st.caption("Made using Streamlit")

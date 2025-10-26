@@ -10,6 +10,18 @@ from sklearn.pipeline import Pipeline
 from sklearn.metrics import accuracy_score, classification_report
 import os
 
+from textblob import TextBlob
+
+def analyze_text(text, model=None):
+    analysis = TextBlob(text)
+    polarity = analysis.sentiment.polarity
+
+    if polarity > 0:
+        return "Positive 😊"
+    elif polarity < 0:
+        return "Negative 😞"
+    else:
+        return "Neutral 😐"
 
 df = pd.read_csv("test.csv", encoding="windows-1252")
 print("Columns:", df.columns)
@@ -76,4 +88,5 @@ while True:
     if user_input.lower() == "quit":
         break
     print("Predicted sentiment:", predict_sentiment(user_input))
+
 
